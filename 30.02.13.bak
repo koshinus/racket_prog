@@ -1,0 +1,62 @@
+#lang racket
+;доделать
+;обратный перевод
+;"35,A6(D)"-->"11101,1010110(1101)"
+
+(define (func str)
+(filter number? (map string->number (string-split str))))
+
+(define (16->2 x)
+  (cond ((equal? x #\1) "1")
+        ((equal? x #\2) "10")
+        ((equal? x #\3) "11")
+        ((equal? x #\4) "100")
+        ((equal? x #\5) "101")
+        ((equal? x #\6) "110")
+        ((equal? x #\7) "111")
+        ((equal? x #\8) "1000")
+        ((equal? x #\9) "1001")
+        ((equal? x #\0) "0000")
+        ((equal? x #\A) "1010")
+        ((equal? x #\B) "1011")
+        ((equal? x #\C) "1100")
+        ((equal? x #\D) "1101")
+        ((equal? x #\E) "1110")
+        ((equal? x #\,) ",")
+        ((equal? x #\() "(")
+        ((equal? x #\)) ")")))
+
+(define (S16->S2 s)
+  (define (help lst1 str)
+    (if (empty? lst1) str
+        (help (cdr lst1) (string-append (16->2 (car lst1)) str))))
+  (help (reverse (string->list s)) ""))
+
+(define (small n)
+  (if (< n 10) (integer->char (+ n 48)) (integer->char (+ n 55))))
+
+(define (2->10 lst)
+  (foldl (λ (n s) (+ (* s 2) n)) 0 lst))
+
+(define (main lst)
+  (define (help lst1 lst2)
+    (if (empty? lst1) (reverse lst2)
+        (help (drop 4 lst1) (cons (small (2->10 (take 4 lst1))) lst2))))
+  (help lst '()))
+
+;дано 2 натуральных числа поделить, результат записать в виде 3.2734(3767623)
+
+(define (amount-rank n m)
+  (if (= n 0) m
+      (amount-rank (quotient n 10) (+ m 1))))
+
+(define (smile n) (integer->char (+ n 48)))
+
+(define (writeln lst a b res)
+  (define (help lst lst1 lst2 lst3 x y z o)
+    (if (empty? lst) (string (map (λ (x) (smile x) (list (reverse lst1) (reverse lst2) (reverse lst3)))))
+        (if (< o (amount-rank (quotient x y) 0)) (help (cdr lst) (cons (car lst) lst1) lst2 lst3
+
+;(define (division a b)
+ ; (define (help a b res lst)
+  ;  (if (member (quotient res b) lst) 

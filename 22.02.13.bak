@@ -1,0 +1,24 @@
+#lang racket
+(define (fib n)
+(define (it a b k)
+(if (= k 0) b (it b (+ a b) (- k 1))))
+(it 1 1 (- n 1)))
+
+(define (cl2fib n)
+  (define (help x a b)
+    (if (> b x) (if (> (- b x) (- x a)) a b)
+        (help x b (+ a b))))
+  (help n 1 1))
+
+;список найти самую длинную последловательность, где знаки чередуются (0 нарушает любую последовательность) выдать список
+; есть число, определить ближайшее к нему число фибаначчи
+
+(define (las lst)
+  (define (help lst1 lst2 lst3 a)
+    (if (empty? (cdr lst1)) (if (> a 0) (if (< (car lst1) 0) 
+                                             (if (> (length lst2) (length (cons (car lst1) lst3))) lst2 lst3)
+                                             (if (> (length lst2) (length lst3)) lst2 lst3)))
+        (if (> a 0) (if (< (car lst1) 0) 
+                                             (help (cdr lst1) lst2 (cons (car lst1) lst3) (car lst1))
+                                             (help (cdr lst1) (if (> (length lst2) (length lst3)) lst2 lst3) '() (car lst1))))))
+  (help lst '() '() 0))

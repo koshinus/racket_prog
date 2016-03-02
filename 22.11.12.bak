@@ -1,0 +1,15 @@
+#lang racket
+(define (matrix? x)
+  (if (and (list? x) (list? (car x)))
+      (let ((y (length (car x))))
+           (andmap (lambda (lst)
+                     (and (list? lst) (= (length lst) y))))) x) #f)
+
+(define (mat-sum mat1 mat2)
+  (map (lambda (x y) (map + x y))
+       mat1 mat2))
+;транспонирование, умножение и след 
+(define (trans mat)
+  (define (iter mat1 mat2)
+    (if (empty? mat1
+

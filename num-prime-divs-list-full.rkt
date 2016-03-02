@@ -1,0 +1,40 @@
+#lang racket
+(define (square num)
+  (* num num)
+  )
+
+(define (smallest-divisor n)
+  (find-divisor n 2)
+  )
+
+(define (find-divisor n test-divisor)
+  (cond ((> (square test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (find-divisor n (+ test-divisor 1)))
+        )
+  )
+
+(define (divides? a b)
+  (= (remainder b a) 0)
+  )
+
+(define (prime? n)
+  (= n (smallest-divisor n))
+  )
+
+(define (num-prime-divs-list-full n)
+ (define (iter i num ls)
+   (if (= num 1)
+       (cond 
+         ((equal? '() ls) ls)
+         ((equal? '(1) (cdr ls))(cons (car ls) null))
+         (else ls)
+           )
+       (if (and (prime? i)(= 0 (remainder num i)))
+           (iter (/ num i) (/ num i) (cons i ls))
+           (iter (- i 1) num ls)
+        )
+       )
+   )
+  (iter (integer-sqrt n) n '())
+  )

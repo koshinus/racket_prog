@@ -1,0 +1,21 @@
+#lang racket
+;даны n,m, записать в него матрицу, заполенную натуральными числами змейками
+(define (snakes-matrix n m file-out)
+  (define out (open-output-file file-out #:exists 'replace))
+  (define (transpon mat)
+    (define (iter tail result)
+      (if (null? (car tail))
+          (reverse result)
+          (iter (map cdr tail) (cons (map car tail) result))))
+    (iter mat '()))
+  
+  (define (iter tail mat)
+    (if (null? tail)
+        (transpon (reverse mat))
+        (iter (cdr tail)(cons (let ((curr-list (map (λ(x)(+ x m)) (car mat))))
+                                (reverse curr-list)) mat))))
+  (define mat (iter (cddr (range (add1 n))) (list (cdr (range (add1 m))))))
+  (for-each (λ(x)(for-each (λ(y)(write y out)
+                             (display #\space out)) x)
+              (display #\newline out)) mat)
+  (close-output-port out))

@@ -1,0 +1,28 @@
+#lang racket
+(define (value-of-pol lst1 n m)
+  (if (empty? lst1) m
+      (value-of-pol (cddr lst1) n (+ m (* (car lst1) (expt n (cadr lst1)))))))
+
+(define (to-lst2 lst)
+  (define (help lst1 lst2)
+    (if (equal? (car lst) #\return) (reverse lst2)
+        (help (cdr lst1) (cons (car lst1) lst2))))
+  (help lst '()))
+
+(define (to-lst1 lst)
+    (if (equal? (car lst) #\return) (cddr lst)
+        (to-lst1 (cdr lst))))
+
+(define (to-f f lst)
+  (define out (open-output-file f #:exists 'replace))
+  (define (help lst)
+      (if (empty? lst) (close-output-port out)
+          (begin (wtite (car lst) out) (help (cdr lst)))))
+  (help lst))
+
+(define (polinom f)
+  (define (help f lst1 lst2 lst3)
+    (if (empty? lst1) (to-f f lst3)
+        (if (empty? lst2) (help f (to-lst1 lst1) (to-lst2 lst1) lst3)
+            (help f lst1 '() (cons (value-of-pol (cdr lst2) (car lst1) 0) (cons #\space lst3))))))
+  (help "c:\\Racket\\Программы\\in2.txt" (file->list f) '() '()))

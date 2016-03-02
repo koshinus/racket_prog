@@ -1,0 +1,12 @@
+#lang racket
+;многоугольник определить, есть ли в нем вергина, из которой видны все остальные
+(define (task top-list)
+  (define (help1 side res)
+    (if (null? cdr side) res
+        (help (cdr side) (filter (λ (point) ((vector-pr (make-vector (car side) (cadr side)) (make-vector (car side) point)) S 0)) res))))
+  (help1 (cons (car top-list) (reverse top-list))))
+  (define S (- (square top-list)))
+  (define (vec-pr v1 v2) (- (* (car v1) (cdr v2)) (* (cdr v1 (car v2)))))
+  (define (make-vector x y) (cons (- (car y) (car x)) (- (cdr y) (cdr x))))
+;дан треугольник, найти центр описанной окружности  
+;есть многоугольник построить его выпуклую оболочку  

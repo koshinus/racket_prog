@@ -1,0 +1,90 @@
+#lang racket
+;1
+(define (f1 lst n)
+  (append (list (list-ref lst n)) (take lst (+ 0 n)) (drop lst (+ 1 n))))
+
+(define (f2 lst)    
+  (define y (length lst))
+  (define (help lst1 lst2 x)
+    (if (= x y) lst2
+        (help lst1 (cons (f1 lst1 x) lst2) (+ x 1))))
+  (help lst '() 0))
+
+(define (f3 lst)
+  (define l (length lst))
+  (define (help lst1 lst2 n)
+    (if (= l n) (remove-duplicates lst2)
+        (help (append (cdr lst1) (list (car lst1))) (append (f2 lst1) lst2) (+ n 1))))
+  (help lst '() 0))
+
+(define (permutation lst1 lst2)
+  (define (help lst1 lst2 lst3 n)
+    (if (empty? lst1) lst2
+        (if (> (foldl + 0 (map (λ (x y) (gcd x y)) (car lst1) lst3)) n) (help (cdr lst1) (car lst1) lst3 (foldl + 0 (map (λ (x y) (gcd x y)) (car lst1) lst3)))
+            (help (cdr lst1) lst2 lst3 n))))
+  (help (f3 lst1) '() lst2 0))
+
+(define (permutation1 lst)
+  (foldl append '() (build-list (length lst) (lambda (x) (map (lambda (y) (append (car (f1 lst x)) y)) (permutation (cdr (f1 lst x))))))) 
+)
+;2
+(define (vector-quick-sort vec)
+    (if (equal? vec #()) vec
+      (let ( (head (vector-ref vec 0)) )
+        (vector-append (vector-quick-sort (vector-filter (λ (x) (< x head)) vec)) 
+                       (vector-filter (λ (x) (= x head)) vec) (vector-quick-sort (vector-filter (λ (x) (> x head)) vec))))))
+;3
+
+
+;hw
+(define (string-reverse1 str)
+  (define (help str1 str2)
+    (if (equal? str1 "") str2
+        (help (substring str1 1) (string-append (substring str1 0 1)  str2))))
+  (help str ""))
+
+(define (string-reverse2 str) (list->string (reverse (string->list str))))
+
+(define (palindrom str)
+  (define (help str1 str2)
+  (define l (string-length str1))
+    (if (or (= l 1) (= l 0)) (string-append (string-reverse2 str2) str1 str2)
+        (if (= l 2) (if (not (equal? (string-ref str1 0) (string-ref str1 (- l 1)))) 
+                        (string-append (string-reverse2 str2) str2) (string-append (string-reverse2 str2) str1 str2))
+    (cond ((equal? (string-ref str1 0) (string-ref str1 (- l 1))) (help (substring str1 1 (- l 1)) (string-append (string (string-ref str1 0)) str2)))
+          ((equal? (string-ref str1 0) (string-ref str1 (- l 2))) (help (substring str1 1 (- l 2)) (string-append (string (string-ref str1 0)) str2)))
+          ((equal? (string-ref str1 1) (string-ref str1 (- l 1))) (help (substring str1 2 (- l 1)) (string-append (string (string-ref str1 0)) str2)))
+          (else (help (substring str1 1 (- l 1)) str2))))))
+  (help str ""))
+;;;;;;;
+[define {element-of-mas n mas}
+;подаешь список, выдает элемент на n-ом месте
+(define {iter k mas}
+(if (= k 0) (car mas)
+{iter (- k 1) (cdr mas)}))
+(if (<= (length mas) n) #f
+{iter n mas})]
+
+[define {perest s}
+;перестоновки списка s
+(define {iter i rez}
+;итерация, где i-номер эл. в списке s(отсчет от (n-1) до 0)
+(if (empty? (cddr s)) 
+    (list (reverse s) s)
+;если в s 2 ел. то rez:'((a b) (b a))
+(if (= i -1) rez
+    {iter (- i 1) (append rez (map (λ(x) (cons {element-of-mas i s} x)) {perest (append (take s i) (drop (cdr s) i))}
+;запускаем рекурсию без i-ого эл.
+)
+;map-ом приклеиваем I-ый эл. ко всем пер. без него
+)}
+)))
+  {iter (- (length s) 1) '()}]
+;;;;;;;;;;
+(define (bruteforce function degree dictionary)
+  (define (handling pos lst)
+    (append (take lst pos)(drop lst (add1 pos))))
+  (define (inter-recursion deg stack dict len)
+    (if (= 1 deg) (for-each (lambda (x) (function (cons x stack))) dict)
+        (for-each (lambda (x) (inter-recursion (sub1 deg) (cons (list-ref dict x) stack) (handling x dict) (sub1 len))) (range len))))
+  (inter-recursion degree null dictionary (length dictionary)))

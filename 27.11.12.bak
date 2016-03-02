@@ -1,0 +1,15 @@
+#lang racket
+(define (trail mat)
+  (define (help mat1 lst n s)
+    (if (= n (length mat1)) lst
+        (if (= s n) 
+            (help (cdr mat1) (cons (car (car mat1)) lst) (+ n 1) 0)
+            (help (cdr (car mat1)) lst n (+ s 1))))
+    (map + lst))
+  (help mat '() 0 0))
+
+(define (trans mat)
+  (define (help mat1 mat2 lst n)
+    (if (= (- n 1) (length mat1)) mat2
+        (help (list-ref mat1 1) (cons lst mat2) (map (car mat1) mat1) (+ n 1))))
+  (help mat '() '() 0))

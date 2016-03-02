@@ -1,0 +1,64 @@
+#lang racket
+; 1
+(define (scalar1 vec1 vec2)
+  (foldl + 0 (vector->list (vector-map * vec1 vec2))))
+
+(define (vector-foldl f count vector)
+  (if (equal? vector '#()) count
+      (vector-foldl f (f count (vector-ref vector 0)) (vector-drop vector 1))))
+
+(define (scalar vec1 vec2)
+  (vector-foldl + 0 (vector-map * vec1 vec2)))
+
+; 2
+(define (max-in-vector vec)
+  (define (help vec n)
+    (if (equal? '#() vec) n
+        (help (vector-drop vec 1) (if (> (vector-ref vec 0) n) (vector-ref vec 0) n))))
+  (help (vector-drop vec 1)(vector-ref vec 0)))
+
+(define (min-in-vector vec)
+  (define (help vec n)
+    (if (equal? '#() vec) n
+        (help (vector-drop vec 1) (if (< (vector-ref vec 0) n) (vector-ref vec 0) n))))
+  (help (vector-drop vec 1)(vector-ref vec 0)))
+
+(define (vector-square vec)
+  (vector-foldl (lambda (result x) (+ result (* x x))) 0 vec))
+
+(define (closest vec)
+  (define (help vec1 n vec2)
+    (if (equal? #() vec1) vec2
+        (if (< (vector-square (vector-ref vec1 0)) n)
+          (help (vector-drop vec1 1) (vector-square (vector-ref vec1 0)) (vector-ref vec1 0))
+          (help (vector-drop vec1 1) n vec2))))
+  (help (vector-drop vec 1) (vector-square (vector-ref vec 0)) (vector-ref vec 0)))
+
+;3
+(define (vector-sum vec)
+  (define (help vec1 vec2)
+    (if (equal? vec1 '#()) vec2
+        (help (vector-drop vec1 1) (map + (vector-ref vec1 0) vec2))))
+  (help (vector-drop vec 1) (vector-ref vec 0)))
+
+;4
+(define (0-vector m)
+  (define (help m vec n)
+    (if (or (= n m) (> n m)) vec
+        (help m (vector-append #(0) vec) (+ n 1))))
+  (help m #() 0))
+
+(define (polynom-multiple pol1 pol2)
+  (define m (vector-length pol2))
+  (define (help vec2 0-vec1 0-vec2 res1 res2 x y vec1)
+    (if (equal? vec2 #()) (vector-take (vector-map + res1 res2) (- (vector-length (vector-map + res1 res2)) 1))
+        (help (vector-drop vec2 1) (0-vector x) (0-vector y) (vector-append 0-vec1 (vector-map! (λ (x) (* (vector-ref vec2 0) x)) vec1) 0-vec2) 
+              (vector-map + res1 res2) (+ x 1) (- y 1) (vector-map! (λ (x) (/ x (vector-ref vec2 0))) vec1))))
+  (help pol2 #() (0-vector m) (0-vector (+ m (vector-length pol1))) (0-vector (+ m (vector-length pol1))) 1 (- m 1) pol1))
+;5
+;(define (trans mat)
+ ; (define (help mat1 mat2)
+  ;  (if (equal? mat1 #()) mat2
+   ;     (help 
+;(define (mat-mult mat1 mat2)
+ ; (define (help 

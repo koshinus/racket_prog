@@ -1,0 +1,59 @@
+#lang racket
+(define (file-char)
+(define in (open-input-file "in.txt"))
+(define (next)
+(define n (read-char in))
+(display n) ; здесь можно было написать (write n)
+(if (equal? n eof) (write 'end) (next)))
+(next)
+(close-input-port in))
+
+(define (file-upcase f1 f2)
+  (define in (open-input-file f1))
+  (define out (open-output-file f2))
+  (define (help)
+    (define x (read-char in))
+    (if (equal? x eof) (close-output-port out)
+        (begin (write-char (char-upcase x) out) (help))))
+  (help))
+
+(define (word-amount f)
+  (define (help lst n)
+    (if (empty? lst) n
+     (help (cdr lst) (+ n 1))))
+   (help (string-split (file->string f)) 0))
+
+(define (kol-slov)
+  (define str (file->string "1.txt"))
+  (define lt (string-split str))
+  (define n (length lt))
+  (display n))
+
+;1) Подсчитать количество слов в файле. Перенос в тексте не используется.
+;2) Выписать в выходной файл только те предложения, которые содержат слова одной длины. Предложения заканчиваются точкой, слова разделяются пробелами.
+;3) Задано два файла. Выписать в третий файл общие слова без повторений.
+
+(define (tof3 lst f)
+  (define out (open-output-file f #:exists 'replace))
+    (define (help lst)
+      (if (empty? lst) (close-output-port out)
+          (if (equal? (car lst) #\space)
+          (begin (write-char (car lst) out) (help (cdr lst)))    
+          (begin (write-string (car lst) out) (help (cdr lst))))))
+  (help lst))
+
+(define (space+ lst1 lst2)
+  (if (empty? lst1) lst2
+      (space+ (cdr lst1) (cons #\space (cons (car lst1) lst2)))))
+
+(define (f1f2tof3 f1 f2)
+    (define (help1 lst1 lst2 lst3 lst4)
+      (if (or (empty? lst1) (empty? lst3)) (tof3 (space+ lst4 '()) "in3.txt")
+          (if (empty? lst2) (help1 (cdr lst1) lst3 lst3 lst4)
+            (if (equal? (car lst1) (car lst2))
+                (help1 (cdr lst1) (remove (car lst1) lst3) (remove (car lst1) lst3) (cons (car lst1) lst4))
+                (help1 lst1 (cdr lst2) lst3 lst4)))))
+    (define (help lst1 lst2)
+    (if (> (length lst1) (length lst2)) (help1 lst1 lst2 lst2 '()) (help1 lst2 lst1 lst1 '())))
+  (help (string-split (file->string f1)) (string-split (file->string f2))))
+; файл не все слова, а только те, которые начинаются с буквы а

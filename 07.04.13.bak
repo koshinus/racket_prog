@@ -1,0 +1,32 @@
+#lang racket
+;2) Сформировать список всех его листьев.
+(define (tree->list-2 tree)
+  (define (entry tree) (car tree))
+  (define (left-branch tree) (cadr tree))
+  (define (right-branch tree) (caddr tree))
+  (define (make-tree entry left right)
+    (list entry left right))
+  (define (copy-to-list tree result-list)
+    (if (null? tree) result-list
+        (copy-to-list (left-branch tree)
+                      (cons (entry tree)
+                            (copy-to-list (right-branch tree) result-list)))))
+(copy-to-list tree '() ))
+
+(define (all-leaf tree)
+  (define (help lst1 lst2 lst3)
+    (if (and (null? (cadr lst1)) (null? (cadr lst2)))
+        (remove 0 (complete (car (cons (caddr lst1) (cons (caddr lst2) lst3))) (cadr (cons (caddr lst1) (cons (caddr lst2) lst3)))))
+        (help (cdr lst1) (cdr lst2) lst3)))
+  (help (cadr tree) (caddr tree) '()))
+
+(define (complete lst1 lst2)
+  (define (help lst1 lst2 lst3 lst4)
+    (list (if (empty? lst1) 0 (car lst1)) 
+               (if (empty? lst2) 0 (car lst2)) 
+               (if (empty? lst3) 0 (car lst3)) 
+               (if (empty? lst4)  0 (car lst4))))
+  (help (cadr lst1) (caddr lst1) (cadr lst2) (caddr lst2)))
+;3) В список должны попасть только те узлы, которые имеют детей с четной разрядностью.
+
+;4) Проверить дерево на сбалансированность.

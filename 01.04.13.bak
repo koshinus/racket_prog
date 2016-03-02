@@ -1,0 +1,74 @@
+#lang racket
+(define (data f1 f2)
+  (define in (open-input-file f1))
+  (define out (open-output-file f2 #:exists 'replace))
+  (define n (read in))
+  (define m (read in))
+  (define  (help0 i res)
+    (if (= i 0) (reverse res)
+        (help0 (- i 1) (cons (read in) res))))
+  (define s (help0 m '()))
+  (define (help1 i)
+    (if (= i 0) (close-output-port out)
+    (begin (help2 (read in) s) (help1 (- i 1)))))
+  (define (help2 k0 s)
+    (cond ((not (empty? s)) (let ((x (read in)))
+                              (cond ((not (= x 0)) 
+                                     (begin (display k0 out) (display #\space out) (display x out) 
+                                            (display " " out) (display (car s) out) (display #\return out) (display #\newline out))))
+                              (help2 k0 (cdr s))))))
+  (help1 n))
+;имеется прямоугольное поле есть команды вперед (сколько-то шагов) повернутся, выяснить сколько клеток он посетил (посещенные клетки не считаются)
+
+(define (member? x lst)
+  (if (empty? lst) 0
+   (if (equal? x (car lst)) 1
+          (member? x (cdr lst)))))
+
+(define (eq-pair-in-list pair lst)
+  ;(define (help p1 lst1 lst2)
+   ; (if (empty? lst1) (reverse lst2)
+  (map (λ (x) (if (and (= (car pair) (car x)) (= (cadr pair) (cadr x))) 1 0) (car lst)) lst))
+
+(define (right-left command direction n)
+  (if (= n 1) direction
+   (if (equal? command "right") 
+      (cond ((equal? direction "up") (right-left command "right" 1))
+            ((equal? direction "right") (right-left command "down" 1))
+            ((equal? direction "down") (right-left command "left" 1))
+            ((equal? direction "left") (right-left command "up" 1)))
+      (if (equal? command "left")
+          (cond ((equal? direction "up") (right-left command "left" 1))
+            ((equal? direction "right") (right-left command "up" 1))
+            ((equal? direction "down") (right-left command "right" 1))
+            ((equal? direction "left") (right-left command "down" 1)))
+          (right-left command direction 1)))))
+
+[define {poisk k s}
+(if (memf (λ(x) (and (= (car x) (car k))
+(= (cdr x) (cdr k)))) s) s (cons k s))]
+      
+(define (func dir p n lst)
+  (define (help d p n m lst)
+    (if (= n m) (poisk p lst)
+      (cond ((equal? d "up") (help d (cons (car p) (+ (cdr p) 1)) n (+ m 1) (poisk p lst)))
+            ((equal? d "left") (help d (cons (- (car p) 1) (cdr p)) n (+ m 1) (poisk p lst)))
+            ((equal? d "down") (help d (cons (car p) (- (cdr p) 1)) n (+ m 1) (poisk p lst)))
+            ((equal? d "right") (help d (cons (+ (car p) 1) (cdr p)) n (+ m 1) (poisk p lst))))))
+  (help dir p n 0 lst))
+
+(define (robot lst)
+  (define (help lst1 pair dir lst2)
+    (if (empty? lst1) lst2
+        (if (number? (car lst1)) (help (cdr lst1) (car (func dir pair (car lst1) lst2)) dir (func dir pair (car lst1) lst2))
+            (help (cdr lst1) (car (func (right-left (car lst1) dir 0) pair 0 lst2)) (right-left (car lst1) dir 0) (func (right-left (car lst1) dir 0) pair 0 lst2)))))
+(help lst (cons 0 0) "right" '()))
+
+(define (file-char f1)
+(define in (open-input-file f1) )
+  (define (help lst)
+(define (next)
+(define n (read-char in))
+(if (equal? n eof) lst (begin (next) (cons n lst)))
+(help '())))
+(close-input-port in))

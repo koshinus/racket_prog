@@ -1,0 +1,54 @@
+#lang racket
+(define (trans mat)
+  (define (help mat1 mat2)
+    (if (empty? (car mat1)) (reverse mat2)
+        (help (map cdr mat1) (cons (map car mat1) mat2))))
+  (help mat '()))
+
+(define (build-mat n m f)
+  (build-list m (λ (x) (build-list n (λ (y) (f x y))))))
+
+(define (build-mat1 n m)
+  (build-list n (λ (x) (build-list m (λ (y) (+ x y))))))
+
+(define (map-mat f mat)
+  (map (λ (x) (map f (car mat))) mat))
+
+(define (map-mat1 f mat)
+  (define (help f mat1 mat2)
+    (if (empty? mat1) (reverse mat2)
+        (help f (cdr mat1) (cons (map f (car mat1)) mat2))))
+  (help f mat '()))
+
+(define (to-f f lst)
+  (define out (open-output-file f))
+    (define (help lst1 lst2)
+      (if (empty? lst1) (close-output-port out)
+          (if (empty? lst2) (help (cdr lst1) (car lst1))
+              (if (or (equal? (car lst2) #\return) (equal? (car lst2) #\newline) (equal? (car lst2) #\space))
+          (begin (write-char (car lst2) out) (help lst1 (cdr lst2)))        
+          (begin (write-string (car lst2) out) (help lst1 (cdr lst2)))))))
+  (help (cdr lst) (car lst)))
+
+(define (mat-reverse mat)
+  (define (help mat1 mat2)
+    (if (empty? mat1) (reverse mat2)
+        (help (cdr mat1) (cons (reverse (car mat1)) mat2))))
+  (help mat '()))
+
+(define (value-in-mat x)
+  (define (help x y mat)
+    (if (= x y) (reverse mat)
+        (help x (+ y 1) (cons (list y) mat))))
+  (help x 0 '()))
+
+(define (snake-mat n m)
+  (define (help mat lst y x z)
+    (if (= z x) (mat-reverse (trans mat))
+        (help 
+         (if (= (remainder z 2) 0) (cons (reverse (map (λ (a) (+ y a)) lst)) mat) (cons (map (λ (a) (+ y a)) lst) mat)) (car mat) y x (+ z 1))))
+  (if (= n 1) (value-in-mat m)
+  (help (reverse (list (map (λ (a) (+ m a)) (map add1 (build-list m values))) (map add1 (build-list m values)))) (map (λ (a) (+ m a)) (build-list m values)) m n 2)))
+         
+(define (mat-to-file n m)
+  (map-mat1 add1 (trans (build-mat1 n m))))

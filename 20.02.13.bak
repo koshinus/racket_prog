@@ -1,0 +1,12 @@
+#lang racket
+(define (int2str str)
+  (define (help lst1 lst2 lst3 a b)
+    (if (empty? lst1) lst2
+        (if (and (> (char->integer (car lst1)) 47) (< (char->integer (car lst1)) 58))
+            (if (or (equal? #\space a) (and (> (char->integer a) 47) (< (char->integer a) 58)))
+                (help (cdr lst1) (cons (char->integer (car lst1) lst2)) lst3 (car lst1) (+ b 1))
+                (help (cdr lst1) lst2 lst3 (car lst1) 0))
+            (if (and (> (char->integer (car lst1)) 47) (< (char->integer (car lst1)) 58))
+                (help (cdr lst1) lst2 (cons b lst3) (car lst1) 0)
+                (help (cdr lst1) lst2 lst3 (car lst1) 0)))))
+  (help (string->list str) '() '() #\space 0))
